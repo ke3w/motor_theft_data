@@ -10,12 +10,19 @@ abstract: "This paper explores patterns of motor vehicle theft in Toronto betwee
 format: pdf
 number-sections: true
 bibliography: references.bib
+execute:
+  echo: true
+  eval: true
+  cache: true
+  cache.lazy: false
+  global: true
 ---
 
 ```{r}
 #| include: false
 #| warning: false
 #| message: false
+#| 
 
 library(tidyverse)
 library(palmerpenguins)
@@ -31,17 +38,33 @@ The reminder of this paper is constructed as follows: \@#sec-data: Describe data
 
 # Data {#sec-data}
 
-The data used in this analysis was sourced from Open Data Toronto. Specifically, the dataset focuses on reported incidents of motor vehicle theft in Toronto from 2020 to 2024. As for the key variables in the dataset, REPORT_DATE: The date on which the theft was officially reported. OCC_DATE: The date on which the theft occurred. LOCATION_TYPE: Describes the type of location where the vehicle was stolen (e.g., "Parking Lot", "Street"). PREMISES_TYPE: Indicates whether the theft occurred inside or outside (e.g., "Outside", "House"). OFFENCE: A categorical variable that describes the type of offense (e.g., "Theft From Motor Vehicle Under"). DIVISION: Represents the police division that handled the report. HOOD_158: Represents the neighborhood where the incident occurred.
+The data used in this analysis was sourced from Open Data Toronto. Specifically, the dataset focuses on reported incidents of motor vehicle theft in Toronto from 2020 to 2024. As for the key variables in the dataset, REPORT_DATE: The date on which the theft was officially reported.
 
-Some of our data is of penguins (@fig-bills), from @palmerpenguins.
+OCC_DATE: The date on which the theft occurred.
+
+LOCATION_TYPE: Describes the type of location where the vehicle was stolen (e.g., "Parking Lot", "Street").
+
+PREMISES_TYPE: Indicates whether the theft occurred inside or outside (e.g., "Outside", "House").
+
+OFFENCE: A categorical variable that describes the type of offense (e.g., "Theft From Motor Vehicle Under").
+
+DIVISION: Represents the police division that handled the report.
+
+HOOD_158: Represents the neighborhood where the incident occurred.
+
+Shown as the diagram (@fig-year), the number of reported incidents of motor theft is relatively close every year. As for 2024, the total number is approximately half of the other year’s since the dataset used in this paper only up to June 2024. The relationship between the number of cases and year indicates that there is not a strong connection between these two variables. The number of incidents is likely not to be affect by any certain year.
 
 ```{r}
 #| label: fig-year
 #| fig-cap: Motor Vehicle Thefts by Year
 #| echo: false
+#| warning: false
+#| message: false
+#| error: false  # Hides errors, warnings, and messages
+
 
 library(ggplot2)
-
+theft_data <- read_csv("/Users/wuxinze/Desktop/theft1/data/raw_data/theft_raw_data.csv")
 ggplot(theft_data, aes(x = factor(REPORT_YEAR))) +
   geom_bar(fill = "steelblue", color = "black") +
   labs(title = "Motor Vehicle Thefts by Year", 
@@ -52,15 +75,13 @@ ggplot(theft_data, aes(x = factor(REPORT_YEAR))) +
     plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
     axis.text.x = element_text(angle = 45, hjust = 1, size = 12), 
     axis.text.y = element_text(size = 12),
-    axis.title = element_text(size = 14)
+    axis.title = element_text(size = 14),
   )
 
 
 ```
 
-Talk more about it.
-
-And also planes (@fig-planes). (You can change the height and width, but don't worry about doing that until you have finished every other aspect of the paper - Quarto will try to make it look nice and the defaults usually work well once you have enough text.)
+One of the most critical independent variable in this dataset is location, the following diagram shows the number of incidents in the top 5 locations where car thefts are most likely to occur, shown as (@fig-location).
 
 ```{r}
 #| label: fig-location
@@ -94,8 +115,6 @@ ggplot(filtered_theft_data, aes(x = LOCATION_TYPE)) +
 
 ```
 
-Talk way more about it.
-
 # Model {#sec-model}
 
 The goal of our modelling strategy is twofold. Firstly,...
@@ -106,7 +125,6 @@ Here we briefly describe the Bayesian analysis model used to investigate... Back
 
 Define $y_i$ as the number of seconds that the plane remained aloft. Then $\beta_i$ is the wing width and $\gamma_i$ is the wing length, both measured in millimeters.
 
-```{=tex}
 \begin{align} 
 y_i|\mu_i, \sigma &\sim \mbox{Normal}(\mu_i, \sigma) \\
 \mu_i &= \alpha + \beta_i + \gamma_i\\
@@ -115,7 +133,7 @@ y_i|\mu_i, \sigma &\sim \mbox{Normal}(\mu_i, \sigma) \\
 \gamma &\sim \mbox{Normal}(0, 2.5) \\
 \sigma &\sim \mbox{Exponential}(1)
 \end{align}
-```
+
 We run the model in R [@citeR] using the `rstanarm` package of @rstanarm. We use the default priors from `rstanarm`.
 
 ### Model justification
@@ -127,34 +145,6 @@ We can use maths by including latex between dollar signs, for instance $\theta$.
 # Results {#sec-result}
 
 Our results are summarized in @tbl-modelresults.
-
-```{r}
-#| echo: false
-#| eval: true
-#| warning: false
-#| message: false
-
-library(rstanarm)
-
-first_model <-
-  readRDS(file = here::here("models/first_model.rds"))
-```
-
-```{r}
-#| echo: false
-#| eval: true
-#| label: tbl-modelresults
-#| tbl-cap: "Explanatory models of flight time based on wing width and wing length"
-#| warning: false
-
-modelsummary::modelsummary(
-  list(
-    "First model" = first_model
-  ),
-  statistic = "mad",
-  fmt = 2
-)
-```
 
 # Discussion {#sec-diss}
 
@@ -186,47 +176,11 @@ In @fig-ppcheckandposteriorvsprior-1 we implement a posterior predictive check. 
 
 In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior. This shows...
 
-```{r}
-#| eval: true
-#| echo: false
-#| message: false
-#| warning: false
-#| label: fig-ppcheckandposteriorvsprior
-#| layout-ncol: 2
-#| fig-cap: "Examining how the model fits, and is affected by, the data"
-#| fig-subcap: ["Posterior prediction check", "Comparing the posterior with the prior"]
-
-pp_check(first_model) +
-  theme_classic() +
-  theme(legend.position = "bottom")
-
-posterior_vs_prior(first_model) +
-  theme_minimal() +
-  scale_color_brewer(palette = "Set1") +
-  theme(legend.position = "bottom") +
-  coord_flip()
-```
-
 ## Diagnostics
 
 @fig-stanareyouokay-1 is a trace plot. It shows... This suggests...
 
 @fig-stanareyouokay-2 is a Rhat plot. It shows... This suggests...
-
-```{r}
-#| echo: false
-#| eval: true
-#| message: false
-#| warning: false
-#| label: fig-stanareyouokay
-#| fig-cap: "Checking the convergence of the MCMC algorithm"
-#| fig-subcap: ["Trace plot", "Rhat plot"]
-#| layout-ncol: 2
-
-plot(first_model, "trace")
-
-plot(first_model, "rhat")
-```
 
 \newpage
 
