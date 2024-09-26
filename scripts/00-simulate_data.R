@@ -20,6 +20,7 @@ set.seed(4478)
 start_date <- as.Date('2020-01-01')
 end_date <- as.Date('2024-06-30')
 
+#Randomly select target based on the features of actual data structure
 simulated_data <- data.frame(
   OCC_DATE = sample(seq(start_date, end_date, by = "day"), 100, replace = TRUE),
   REPORT_DATE = sample(seq(start_date, end_date, by = "day"), 100, replace = TRUE),
@@ -30,7 +31,7 @@ simulated_data <- data.frame(
   HOOD_158 = sample(unique(raw_data$HOOD_158), 100, replace = TRUE)
 )
 
-
+#Run anova test to check the reliability of the simulated data.
 anova_result <- aov(REPORT_DOY ~ LOCATION_TYPE, data = raw_data)
 summary(anova_result)
 write.csv(simulated_data, "data/analysis_data/theft_analysis_data.csv", row.names = FALSE)

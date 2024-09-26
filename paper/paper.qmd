@@ -26,6 +26,9 @@ execute:
 
 library(tidyverse)
 library(palmerpenguins)
+library(readr)
+
+theft_data <- read_csv("/Users/wuxinze/Desktop/theft1/data/raw_data/theft_raw_data.csv")
 ```
 
 # Introduction
@@ -34,23 +37,33 @@ Motor vehicle theft is getting more and more serious across Great Toronto Area. 
 
 The availability of Open Data Toronto provides a valuable resource for analyzing crime trends. This paper uses data from Open Data Toronto on thefts from motor vehicles to identify key factors that contribute to these incidents.
 
-The reminder of this paper is constructed as follows: \@#sec-data: Describe data sources and simulation process \@#sec-model: Visualize the data to have a better Readability \@#sec-result: Provide a comprehensive description and summary of the data. \@#sec-diss: Express personal thinking on the result
+The reminder of this paper is constructed as follows:
+
+[Data](#sec-data): Explain data sources and simulation process and visualize the relationship between variables.
+
+[Result](#sec-result): Provide a comprehensive description and summary of the data.
+
+[Discussion](#sec-diss): Express personal thinking on the result.
 
 # Data {#sec-data}
 
-The data used in this analysis was sourced from Open Data Toronto. Specifically, the dataset focuses on reported incidents of motor vehicle theft in Toronto from 2020 to 2024. As for the key variables in the dataset, REPORT_DATE: The date on which the theft was officially reported.
+The data used in this analysis was sourced from Open Data Toronto. Specifically, the dataset focuses on reported incidents of motor vehicle theft in Toronto from 2020 to 2024. As for the key variables in the dataset,
 
-OCC_DATE: The date on which the theft occurred.
+-   REPORT_DATE: The date on which the theft was officially reported.
 
-LOCATION_TYPE: Describes the type of location where the vehicle was stolen (e.g., "Parking Lot", "Street").
+-   OCC_DATE: The date on which the theft occurred.
 
-PREMISES_TYPE: Indicates whether the theft occurred inside or outside (e.g., "Outside", "House").
+-   LOCATION_TYPE: Describes the type of location where the vehicle was stolen (e.g., "Parking Lot", "Street").
 
-OFFENCE: A categorical variable that describes the type of offense (e.g., "Theft From Motor Vehicle Under").
+-   PREMISES_TYPE: Indicates whether the theft occurred inside or outside (e.g., "Outside", "House").
 
-DIVISION: Represents the police division that handled the report.
+-   OFFENCE: A categorical variable that describes the type of offense (e.g., "Theft From Motor Vehicle Under").
 
-HOOD_158: Represents the neighborhood where the incident occurred.
+-   DIVISION: Represents the police division that handled the report.
+
+-   HOOD_158: Represents the neighborhood where the incident occurred.
+
+Each of these variables provides crucial information for understanding the characteristics of motor vehicle thefts, such as the type of locations most susceptible to theft, the geographic spread of incidents, and any potential time-based patterns.
 
 Shown as the diagram (@fig-year), the number of reported incidents of motor theft is relatively close every year. As for 2024, the total number is approximately half of the other year’s since the dataset used in this paper only up to June 2024. The relationship between the number of cases and year indicates that there is not a strong connection between these two variables. The number of incidents is likely not to be affect by any certain year.
 
@@ -60,8 +73,9 @@ Shown as the diagram (@fig-year), the number of reported incidents of motor thef
 #| echo: false
 #| warning: false
 #| message: false
-#| error: false  # Hides errors, warnings, and messages
-
+#| error: false
+#| fig-width: 5
+#| fig-height: 2
 
 library(ggplot2)
 theft_data <- read_csv("/Users/wuxinze/Desktop/theft1/data/raw_data/theft_raw_data.csv")
@@ -72,16 +86,16 @@ ggplot(theft_data, aes(x = factor(REPORT_YEAR))) +
        y = "Count") +
   theme_minimal() + 
   theme(
-    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
-    axis.text.x = element_text(angle = 45, hjust = 1, size = 12), 
-    axis.text.y = element_text(size = 12),
-    axis.title = element_text(size = 14),
+    plot.title = element_text(hjust = 0.5, size = 12, face = "bold"),
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 8), 
+    axis.text.y = element_text(size = 8),
+    axis.title = element_text(size = 10),
   )
 
 
 ```
 
-One of the most critical independent variable in this dataset is location, the following diagram shows the number of incidents in the top 5 locations where car thefts are most likely to occur, shown as (@fig-location).
+Compare to "year", another of the most critical independent variable in this dataset is location, the following figure shows the number of incidents at the top 5 locations where car thefts are most likely to occur shown as (@fig-location). Top 5 motor theft location (from top1 - top5) are Parking lots, single home, streets, apartment and private property structure.
 
 ```{r}
 #| label: fig-location
@@ -89,6 +103,8 @@ One of the most critical independent variable in this dataset is location, the f
 #| echo: false
 #| warning: false
 #| message: false
+#| fig-width: 6
+#| fig-height: 3
 
 
 library(ggplot2)
@@ -107,81 +123,54 @@ ggplot(filtered_theft_data, aes(x = LOCATION_TYPE)) +
        y = "Count") +
   theme_minimal() +
   theme(
-    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
-    axis.text.x = element_text(angle = 45, hjust = 1, size = 6),
-    axis.text.y = element_text(size = 12),
-    axis.title = element_text(size = 14)
+    plot.title = element_text(hjust = 0.5, size = 12, face = "bold"),
+    axis.text.x = element_text(angle = 35, hjust = 1, size = 6),
+    axis.text.y = element_text(size = 8),
+    axis.title = element_text(size = 10)
   )
 
 ```
 
-# Model {#sec-model}
-
-The goal of our modelling strategy is twofold. Firstly,...
-
-Here we briefly describe the Bayesian analysis model used to investigate... Background details and diagnostics are included in [Appendix -@sec-model-details].
-
-## Model set-up
-
-Define $y_i$ as the number of seconds that the plane remained aloft. Then $\beta_i$ is the wing width and $\gamma_i$ is the wing length, both measured in millimeters.
-
-\begin{align} 
-y_i|\mu_i, \sigma &\sim \mbox{Normal}(\mu_i, \sigma) \\
-\mu_i &= \alpha + \beta_i + \gamma_i\\
-\alpha &\sim \mbox{Normal}(0, 2.5) \\
-\beta &\sim \mbox{Normal}(0, 2.5) \\
-\gamma &\sim \mbox{Normal}(0, 2.5) \\
-\sigma &\sim \mbox{Exponential}(1)
-\end{align}
-
-We run the model in R [@citeR] using the `rstanarm` package of @rstanarm. We use the default priors from `rstanarm`.
-
-### Model justification
-
-We expect a positive relationship between the size of the wings and time spent aloft. In particular...
-
-We can use maths by including latex between dollar signs, for instance $\theta$.
-
 # Results {#sec-result}
 
-Our results are summarized in @tbl-modelresults.
+The analysis of motor vehicle theft incidents reveals several important trends and patterns. This section presents the results of the data exploration, focusing on the relationship between the number of theft incidents and **location type**.
+
+A deeper look into the relationship between location type and theft incidents reveals a clear pattern. As shown in (@fig-location), parking lots, streets, and residential areas are the most common locations for motor vehicle theft. In particular, **parking lots** are the most frequent sites for vehicle thefts, followed closely by thefts on streets. Residential areas, such as private driveways or garages, also account for a significant portion of the incidents.
+
+The results highlight that certain location types are more vulnerable to theft than others such as parking lots and streets. This pattern underscores the need for increased security measures in these areas.
 
 # Discussion {#sec-diss}
 
-## First discussion point {#sec-first-point}
+The analysis demonstrates that the number of motor vehicle theft incidents has remained relatively stable over the years, with no major fluctuations, which suggests that motor vehicle theft is a persistent problem in Toronto, unaffected by year-specific external factors. The data shows that certain locations, particularly **parking lots** and **streets**, are consistently more vulnerable to theft. This is likely due to the relatively low levels of security in these areas and the ease of access for potential offenders.
 
-If my paper were 10 pages, then should be be at least 2.5 pages. The discussion is a chance to show off what you know and what you learnt from all this.
+The findings suggest that targeted interventions, such as improving security in high-risk areas (e.g., parking lots) and increasing public awareness, could help reduce motor vehicle theft. Enhanced security measures, such as installing surveillance cameras, increasing street lighting, and encouraging car owners to use anti-theft devices, are practical recommendations that could mitigate theft in these vulnerable areas.
 
-## Second discussion point
+## Policy Implications
 
-## Third discussion point
+City planners, law enforcement agencies, and community safety organizations could benefit from focusing on high-risk areas identified in this analysis. For example, the city could:
+
+-   Introduce stricter security protocols for parking lots.
+
+-   Encourage neighborhood watch programs in residential areas.
+
+-   Collaborate with private businesses to implement surveillance in public parking spaces.
 
 ## Weaknesses and next steps
 
-Weaknesses and next steps should also be included.
+While this study provides valuable insights, several limitations need to be acknowledged:
 
-\newpage
+1.  **Incomplete Data for 2024**: The dataset for 2024 only covers incidents up to June. This incomplete data may affect the interpretation of trends for that year and limit our ability to compare 2024 with previous years.
 
-\appendix
+2.  **Lack of Specific Contextual Factors**: The dataset lacks additional contextual information such as the time of day, weather conditions, or detailed security measures in place at the time of the incidents. Besides, the dataset also lacks the detailed information of the stolen vehicles such as brand, model, year even vehicle body type. Including these factors could provide a more nuanced understanding of what drives theft in certain locations.
 
-# Appendix {.unnumbered}
+3.  **Focus on Location Type**: While location type is a significant factor in motor vehicle theft, this study does not explore other potentially important variables such as the type of vehicles targeted or the socio-economic characteristics of the neighborhoods where thefts occurred.
 
-# Additional data details
+4.  **Exclusion of Unreported Thefts**: Like many crime statistics, the data only includes reported incidents. Unreported thefts may lead to an underestimation of the true scope of the problem, particularly in certain areas where reporting may be less common.
 
-# Model details {#sec-model-details}
-
-## Posterior predictive check
-
-In @fig-ppcheckandposteriorvsprior-1 we implement a posterior predictive check. This shows...
-
-In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior. This shows...
-
-## Diagnostics
-
-@fig-stanareyouokay-1 is a trace plot. It shows... This suggests...
-
-@fig-stanareyouokay-2 is a Rhat plot. It shows... This suggests...
+These weaknesses suggest that future research could benefit from incorporating more detailed variables and a broader data set, potentially integrating qualitative information from police reports or victim surveys to complement the quantitative data.
 
 \newpage
 
 # References
+
+**City of Toronto.** (n.d.). *Theft from Motor Vehicle*. Open Data Toronto. Retrieved \[09/26/2024\], from <https://open.toronto.ca/dataset/theft-from-motor-vehicle/>
