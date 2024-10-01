@@ -1,4 +1,4 @@
-# Term Paper 1 - Xinze Wu
+# Xinze Wu
 
 ## Overview
 
